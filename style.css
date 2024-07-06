@@ -36,6 +36,18 @@ table {
 	border-radius: 6px;
 	user-select: none;
 }
+table:before {
+	content: "";
+	position: absolute;
+	top: -16px;
+	left: 50%;
+	width: 0px;
+	height: 0px;
+	border-style: solid;
+	border-width: 0 8px 16px 8px;
+	border-color: transparent transparent whitesmoke transparent;
+	transform: translateX(-50%);
+}
 table tr:not(:first-of-type) td {
 	padding-top: 12px;
 }
