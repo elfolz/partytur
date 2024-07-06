@@ -44,12 +44,15 @@ table tr td {
 table tr td.active {
 	background-color: rgba(255, 255, 255, 0.25);
 }
-table tr td span {
+table tr td label, table tr td span {
 	display: block;
 	text-align: center;
-	line-height: 2rem;
 }
-table tr td span:last-of-type {
+table tr td label {
+	line-height: 2.5rem;
+}
+table tr td span {
 	font-size: 1rem;
 	opacity: 0.5;
+	line-height: 1rem;
 }

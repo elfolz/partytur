@@ -4,18 +4,18 @@ const notes = []
 const margin = [20, 60]
 const startPosition = 40
 const rhythms = {
-	1: '𝅗',
-	2: '𝅗𝅥',
-	3: '𝅘𝅥',
-	4: '𝅘𝅥𝅮',
-	5: '𝅘𝅥𝅯',
-	6: '𝅘𝅥𝅰',
-	7: '𝅘𝅥𝅱',
-	8: '𝅘𝅥𝅲',
+	1: ['𝅗', '𝄻'],
+	2: ['𝅗𝅥', '𝄼'],
+	3: ['𝅘𝅥', '𝄽'],
+	4: ['𝅘𝅥𝅮', '𝄾'],
+	5: ['𝅘𝅥𝅯', '𝄿'],
+	6: ['𝅘𝅥𝅰', '𝅀'],
+	7: ['𝅘𝅥𝅱', '𝅁']
 }
 
 let currentPosition = 0
 let currentRhythm = 3
+let isBreak = false
 
 function init() {
 	table = document.querySelector('table')
@@ -23,6 +23,7 @@ function init() {
 	ctx = canvas.getContext('2d')
 	resize()
 	refresh()
+	refreshBreak()
 }
 
 function resize() {
@@ -65,15 +66,16 @@ function drawClef(x, y) {
 
 function drawNotes() {
 	notes.forEach((el, i) => {
-		const x = margin[0] + startPosition + (i*20)
+		let pos = 0
 		ctx.beginPath()
-		if (el[0] == 'a') ctx.fillText(rhythms[el[1]], x, margin[1]+35)
-		if (el[0] == 'b') ctx.fillText(rhythms[el[1]], x, margin[1]+29)
-		if (el[0] == 'c') ctx.fillText(rhythms[el[1]], x, margin[1]+23)
-		if (el[0] == 'd') ctx.fillText(rhythms[el[1]], x, margin[1]+17)
-		if (el[0] == 'e') ctx.fillText(rhythms[el[1]], x, margin[1]+11)
-		if (el[0] == 'f') ctx.fillText(rhythms[el[1]], x, margin[1]+5)
-		if (el[0] == 'g') ctx.fillText(rhythms[el[1]], x, margin[1]-1)
+		if (el[0] == 'a') pos = 35
+		else if (el[0] == 'b') pos = 29
+		else if (el[0] == 'c') pos = 23
+		else if (el[0] == 'd') pos = 17
+		else if (el[0] == 'e') pos = 11
+		else if (el[0] == 'f') pos = 5
+		else if (el[0] == 'g') pos = -1
+		ctx.fillText(rhythms[el[1]][el[2] ? 1 : 0], margin[0] + startPosition + (i*20), margin[1]+(pos*el[3]))
 	})
 }
 
@@ -92,10 +94,16 @@ function refreshTable() {
 	if (px < 0) px = 0
 	if (px > cw - table.clientWidth) px = cw - table.clientWidth
 	table.style.setProperty('left', `${px}px`)
-	for (let i=1; i<9; i++) {
+	for (let i=1; i<8; i++) {
 		if (currentRhythm == i) table.querySelector(`#r${i}`).classList.add('active')
 		else table.querySelector(`#r${i}`).classList.remove('active')
 	}
+}
+
+function refreshBreak() {
+	table.querySelectorAll('tr td label').forEach(el => el.style.removeProperty('display'))
+	if (isBreak) table.querySelectorAll('tr td label:first-of-type').forEach(el => el.style.setProperty('display', 'none'))
+	else table.querySelectorAll('tr td label:last-of-type').forEach(el => el.style.setProperty('display', 'none'))
 }
 
 document.onreadystatechange = () => {
@@ -108,17 +116,28 @@ document.onvisibilitychange = () => {
 }
 
 window.onkeydown = e => {
-	if (e.key == 'Backspace') {
+	e.preventDefault()
+	e.stopPropagation()
+	const key = e.key.toLocaleLowerCase()
+	if (key == 'backspace') {
 		notes.pop()
 		if (currentPosition > 0) currentPosition--
 		return
 	}
-	if (['a', 'b', 'c', 'd', 'e', 'f', 'g'].includes(e.key)) {
-		notes.push([e.key, currentRhythm])
+	if (['a', 'b', 'c', 'd', 'e', 'f', 'g'].includes(key)) {
+		let octave = 1
+		if (e.ctrlKey) octave = 2
+		if (e.shiftKey) octave = -2
+		notes.push([key, currentRhythm, isBreak, octave])
 		currentPosition++
 	}
-	if (['1', '2', '3', '4', '5', '6', '7', '8'].includes(e.key)) {
-		currentRhythm = parseInt(e.key)
+	// e.ctrlKey / e.shiftKey / e.altKey
+	if (['1', '2', '3', '4', '5', '6', '7'].includes(key)) {
+		currentRhythm = parseInt(key)
+	}
+	if (key == 'p') {
+		isBreak = !isBreak
+		this.refreshBreak()
 	}
 }
 
