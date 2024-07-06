@@ -3,6 +3,7 @@ var table, canvas, ctx, cw, ch
 const notes = []
 const margin = [20, 60]
 const startPosition = 40
+const spacing = 25
 const lineHeight = 12
 const rhythms = {
 	1: ['𝅗', '𝄻'],
@@ -85,19 +86,19 @@ function drawNotes() {
 		else if (el[0] == 'e') pos = initialNotePosition() - ((lineHeight/2)*4)
 		else if (el[0] == 'f') pos = initialNotePosition() - ((lineHeight/2)*5)
 		else if (el[0] == 'g') pos = initialNotePosition() - ((lineHeight/2)*6)
-		ctx.fillText(rhythms[el[1]][el[2] ? 1 : 0], margin[0] + startPosition + (i*20), margin[1]+pos+(lineHeight*el[3]))
+		ctx.fillText(rhythms[el[1]][el[2] ? 1 : 0], margin[0] + startPosition + (i*spacing), margin[1]+pos+(lineHeight*el[3]))
 	})
 }
 
 function drawCarriage(x, y) {
-	const px = x + startPosition + (notes.length*20)
+	const px = x + startPosition + (notes.length*spacing)
 	ctx.beginPath()
 	ctx.globalAlpha = performance.now() % 500 < 250 ? 1 : 0
 	ctx.fillRect(px, y-6, 1, 5*lineHeight)
 }
 
 function refreshTable() {
-	let px = margin[0] + (notes.length*20) - (table.clientWidth / 2)
+	let px = margin[0] + (notes.length*spacing) - (table.clientWidth / 2)
 	let py = (margin[1] + (lineHeight*4) + 30) * pixelRatio()
 	if (px < 0) px = 0
 	if (px > cw - table.clientWidth) px = cw - table.clientWidth
@@ -120,8 +121,19 @@ function initialNotePosition() {
 	return clefs[c[0]][c[1]]
 }
 
+function handleClick() {
+	document.querySelectorAll('table tr td')?.forEach(el => {
+		el.onclick = e => {
+			const id = e.target?.parentNode?.id
+			if (id) currentRhythm = id.split('')[1]
+		}
+	})
+}
+
 document.onreadystatechange = () => {
-	if (document.readyState == 'complete') init()
+	if (document.readyState != 'complete') return
+	init()
+	handleClick()
 }
 
 document.onvisibilitychange = () => {

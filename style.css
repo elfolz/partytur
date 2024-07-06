@@ -43,6 +43,7 @@ table tr td {
 	padding: 0 12px;
 	border-radius: 6px;
 	transition: all 250ms ease-in-out;
+	cursor: pointer;
 }
 table tr td.active {
 	background-color: rgba(255, 255, 255, 0.25);
@@ -50,6 +51,7 @@ table tr td.active {
 table tr td label, table tr td span {
 	display: block;
 	text-align: center;
+	cursor: pointer;
 }
 table tr td label {
 	line-height: 2.5rem;
