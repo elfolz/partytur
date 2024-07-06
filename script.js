@@ -68,14 +68,15 @@ function drawNotes() {
 	notes.forEach((el, i) => {
 		let pos = 0
 		ctx.beginPath()
-		if (el[0] == 'a') pos = 35
-		else if (el[0] == 'b') pos = 29
-		else if (el[0] == 'c') pos = 23
-		else if (el[0] == 'd') pos = 17
-		else if (el[0] == 'e') pos = 11
-		else if (el[0] == 'f') pos = 5
-		else if (el[0] == 'g') pos = -1
-		ctx.fillText(rhythms[el[1]][el[2] ? 1 : 0], margin[0] + startPosition + (i*20), margin[1]+(pos*el[3]))
+		if (el[0] == 'a') pos = 34
+		else if (el[0] == 'b') pos = 28
+		else if (el[0] == 'c') pos = 22
+		else if (el[0] == 'd') pos = 16
+		else if (el[0] == 'e') pos = 10
+		else if (el[0] == 'f') pos = 4
+		else if (el[0] == 'g') pos = 0
+		const i = ['f', 'g'.includfes(el[0])] ? 4 : 6
+		ctx.fillText(rhythms[el[1]][el[2] ? 1 : 0], margin[0] + startPosition + (i*20), margin[1]+pos+(i*8*el[3]))
 	})
 }
 
@@ -125,13 +126,12 @@ window.onkeydown = e => {
 		return
 	}
 	if (['a', 'b', 'c', 'd', 'e', 'f', 'g'].includes(key)) {
-		let octave = 1
-		if (e.ctrlKey) octave = 2
-		if (e.shiftKey) octave = -2
+		let octave = 0
+		if (e.ctrlKey) octave = 1
+		if (e.shiftKey) octave = -1
 		notes.push([key, currentRhythm, isBreak, octave])
 		currentPosition++
 	}
-	// e.ctrlKey / e.shiftKey / e.altKey
 	if (['1', '2', '3', '4', '5', '6', '7'].includes(key)) {
 		currentRhythm = parseInt(key)
 	}
