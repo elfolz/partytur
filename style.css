@@ -1,0 +1,54 @@
+* {
+	font-family: sans-serif;
+	box-sizing: border-box;
+}
+*:focus {
+	outline: none;
+}
+:root {
+	--color-primary: #1f75fe;
+	--color-accent: #00fa9a;
+}
+body {
+	margin: 0;
+	overflow: hidden;
+}
+canvas {
+	background-color: #121212;
+}
+canvas, .music {
+	font-family: "Noto Music", sans-serif;
+	font-weight: 400;
+	font-style: normal;
+	color: whitesmoke;
+}
+table {
+	position: absolute;
+	top: 140px;
+	left: 20px;
+	z-index: 100;
+	font-size: 2.5rem;
+	border: 1px solid whitesmoke;
+	border-radius: 6px;
+	user-select: none;
+}
+table tr:not(:first-of-type) td {
+	padding-top: 12px;
+}
+table tr td {
+	padding: 0 12px;
+	border-radius: 6px;
+	transition: all 250ms ease-in-out;
+}
+table tr td.active {
+	background-color: rgba(255, 255, 255, 0.25);
+}
+table tr td span {
+	display: block;
+	text-align: center;
+	line-height: 2rem;
+}
+table tr td span:last-of-type {
+	font-size: 1rem;
+	opacity: 0.5;
+}
