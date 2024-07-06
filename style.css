@@ -1,13 +1,14 @@
+:root {
+	--color-primary: #00ffbb;
+	--color-accent: #9370db;
+	color-scheme: light dark;
+}
 * {
 	font-family: sans-serif;
 	box-sizing: border-box;
 }
 *:focus {
 	outline: none;
-}
-:root {
-	--color-primary: #1f75fe;
-	--color-accent: #00fa9a;
 }
 body {
 	margin: 0;
