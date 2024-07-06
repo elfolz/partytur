@@ -168,9 +168,6 @@ document.onvisibilitychange = () => {
 }
 
 window.onkeydown = e => {
-	if (['F5', 'F12'].includes(e.key)) return
-	e.preventDefault()
-	e.stopPropagation()
 	const key = e.key.toLocaleLowerCase()
 	if (key == 'backspace') {
 		notes.pop()
@@ -178,6 +175,8 @@ window.onkeydown = e => {
 		return
 	}
 	if (['a', 'b', 'c', 'd', 'e', 'f', 'g'].includes(key)) {
+		e.preventDefault()
+		e.stopPropagation()
 		let octave = 0
 		if (e.ctrlKey) octave = 7
 		if (e.shiftKey) octave = -7
@@ -185,6 +184,8 @@ window.onkeydown = e => {
 		currentPosition++
 	}
 	if (['1', '2', '3', '4', '5', '6', '7'].includes(key)) {
+		e.preventDefault()
+		e.stopPropagation()
 		currentRhythm = parseInt(key)
 	}
 	if (key == 'p') {
