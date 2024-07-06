@@ -3,6 +3,7 @@ var table, canvas, ctx, cw, ch
 const notes = []
 const margin = [20, 60]
 const startPosition = 40
+const lineHeight = 12
 const rhythms = {
 	1: ['𝅗', '𝄻'],
 	2: ['𝅗𝅥', '𝄼'],
@@ -12,10 +13,21 @@ const rhythms = {
 	6: ['𝅘𝅥𝅰', '𝅀'],
 	7: ['𝅘𝅥𝅱', '𝅁']
 }
+const clefs = {
+	'g': {
+		'4': 36
+	}
+}
+const pixelRatio = () => {
+	let dpr = window.devicePixelRatio || 1
+	let bsr = ctx.webkitBackingStorePixelRatio || ctx.mozBackingStorePixelRatio || ctx.msBackingStorePixelRatio || ctx.oBackingStorePixelRatio || ctx.backingStorePixelRatio || 1
+  return dpr / bsr
+}
 
 let currentPosition = 0
 let currentRhythm = 3
 let isBreak = false
+let pieceClef = 'g4'
 
 function init() {
 	table = document.querySelector('table')
@@ -27,10 +39,11 @@ function init() {
 }
 
 function resize() {
-	cw = canvas.width = window.innerWidth
-	ch = canvas.height = window.innerHeight
-	ctx.font = "36px Noto Music"
+	cw = canvas.width = (window.innerWidth * pixelRatio())
+	ch = canvas.height = (window.innerHeight * pixelRatio())
+	ctx.font = "42px Noto Music"
 	ctx.fillStyle = 'whitesmoke'
+	ctx.setTransform(pixelRatio(), 0, 0, pixelRatio(), 0, 0)
 }
 
 function refresh() {
@@ -46,21 +59,17 @@ function refresh() {
 
 function drawPentagram(x, y) {
 	ctx.beginPath()
+	ctx.globalAlpha = 0.25
 	for (let i=0; i<5; i++) {
-		ctx.moveTo(x, y+(i*12))
-		ctx.lineTo(cw-x, y+(i*12))
+		ctx.fillRect(x, y+(i*lineHeight), cw-(x*2), 1)
 	}
-	ctx.moveTo(x, y)
-	ctx.lineTo(x, y+(4*12))
-	ctx.moveTo(cw-x, y)
-	ctx.lineTo(cw-x, y+(4*12))
-	ctx.lineWidth = 0.25
-	ctx.strokeStyle = 'whitesmoke'
-	ctx.stroke()
+	ctx.fillRect(x-1, y, 1, 4*lineHeight+1)
+	ctx.fillRect(cw-x, y, 1, 4*lineHeight+1)
 }
 
 function drawClef(x, y) {
 	ctx.beginPath()
+	ctx.globalAlpha = 1
 	ctx.fillText("𝄞", x, y+46)
 }
 
@@ -68,33 +77,32 @@ function drawNotes() {
 	notes.forEach((el, i) => {
 		let pos = 0
 		ctx.beginPath()
-		if (el[0] == 'a') pos = 34
-		else if (el[0] == 'b') pos = 28
-		else if (el[0] == 'c') pos = 22
-		else if (el[0] == 'd') pos = 16
-		else if (el[0] == 'e') pos = 10
-		else if (el[0] == 'f') pos = 4
-		else if (el[0] == 'g') pos = 0
-		const i = ['f', 'g'.includfes(el[0])] ? 4 : 6
-		ctx.fillText(rhythms[el[1]][el[2] ? 1 : 0], margin[0] + startPosition + (i*20), margin[1]+pos+(i*8*el[3]))
+		ctx.globalAlpha = 1
+		if (el[0] == 'a') pos = initialNotePosition()
+		else if (el[0] == 'b') pos = initialNotePosition() - (lineHeight/2)
+		else if (el[0] == 'c') pos = initialNotePosition() - ((lineHeight/2)*2)
+		else if (el[0] == 'd') pos = initialNotePosition() - ((lineHeight/2)*3)
+		else if (el[0] == 'e') pos = initialNotePosition() - ((lineHeight/2)*4)
+		else if (el[0] == 'f') pos = initialNotePosition() - ((lineHeight/2)*5)
+		else if (el[0] == 'g') pos = initialNotePosition() - ((lineHeight/2)*6)
+		ctx.fillText(rhythms[el[1]][el[2] ? 1 : 0], margin[0] + startPosition + (i*20), margin[1]+pos+(lineHeight*el[3]))
 	})
 }
 
 function drawCarriage(x, y) {
 	const px = x + startPosition + (notes.length*20)
 	ctx.beginPath()
-	ctx.moveTo(px, y-8)
-	ctx.lineTo(px, y+60)
-	ctx.lineWidth = 1
-	ctx.strokeStyle = performance.now() % 500 < 250 ? 'whitesmoke' : 'transparent'
-	ctx.stroke()
+	ctx.globalAlpha = performance.now() % 500 < 250 ? 1 : 0
+	ctx.fillRect(px, y-6, 1, 5*lineHeight)
 }
 
 function refreshTable() {
-	let px = margin[1] + (notes.length*20) - (table.clientWidth / 2)
+	let px = margin[0] + (notes.length*20) - (table.clientWidth / 2)
+	let py = (margin[1] + (lineHeight*4) + 30) * pixelRatio()
 	if (px < 0) px = 0
 	if (px > cw - table.clientWidth) px = cw - table.clientWidth
 	table.style.setProperty('left', `${px}px`)
+	table.style.setProperty('top', `${py}px`)
 	for (let i=1; i<8; i++) {
 		if (currentRhythm == i) table.querySelector(`#r${i}`).classList.add('active')
 		else table.querySelector(`#r${i}`).classList.remove('active')
@@ -107,9 +115,13 @@ function refreshBreak() {
 	else table.querySelectorAll('tr td label:last-of-type').forEach(el => el.style.setProperty('display', 'none'))
 }
 
+function initialNotePosition() {
+	const c = pieceClef.split('')
+	return clefs[c[0]][c[1]]
+}
+
 document.onreadystatechange = () => {
-	if (document.readyState != 'complete') return
-	init()
+	if (document.readyState == 'complete') init()
 }
 
 document.onvisibilitychange = () => {
@@ -117,6 +129,7 @@ document.onvisibilitychange = () => {
 }
 
 window.onkeydown = e => {
+	if (['F5', 'F12'].includes(e.key)) return
 	e.preventDefault()
 	e.stopPropagation()
 	const key = e.key.toLocaleLowerCase()
